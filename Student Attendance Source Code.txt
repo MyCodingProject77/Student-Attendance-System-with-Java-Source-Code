@@ -1,0 +1,151 @@
+import java.sql.*;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane; 
+import javax.swing.table.DefaultTableModel;
+
+
+
+public NewJFrame() {
+        initComponents();
+        Connect();
+        ShowData();
+    }
+
+
+
+
+    Connection con;
+    PreparedStatement pst; 
+    
+    
+    public void Connect(){
+    
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost/attendancedb","root","");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    
+    
+    }
+
+
+
+
+
+     private void ShowData(){
+    
+        try {
+            int QQ;
+            pst = con.prepareStatement("SELECT * FROM attendance");
+            ResultSet Rs = pst.executeQuery();
+            
+            ResultSetMetaData RSMD = Rs.getMetaData();
+
+            QQ = RSMD.getColumnCount();
+            
+            DefaultTableModel DFG =(DefaultTableModel)table1.getModel(); 
+            
+            DFG.setRowCount(0);
+             
+            while(Rs.next()){
+        
+            Vector v2 = new Vector();
+             
+            for(int aa=1; aa<=QQ; aa++){
+                 
+                v2.add(Rs.getString("id"));
+                v2.add(Rs.getString("name"));
+                v2.add(Rs.getString("section"));
+                v2.add(Rs.getString("status"));
+                
+             }
+             
+             DFG.addRow(v2);
+        
+        }
+          
+        } catch (SQLException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    
+    }
+
+
+
+
+
+    Insert Code
+
+
+     try {
+            String id = txtId.getText();
+            String name = txtName.getText();
+            String section = txtSection.getText();
+            String status = txtStatus.getText();
+            
+            pst = con.prepareStatement("INSERT INTO attendance (id,name,section,status)VALUES(?,?,?,?)");
+            pst.setString(1,id);
+            pst.setString(2,name);
+            pst.setString(3,section);
+            pst.setString(4,status);
+            
+            int k = pst.executeUpdate();
+            if(k==1){
+
+             JOptionPane.showMessageDialog(this, "Record Inserted");
+             ShowData();
+
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }                                         
+
+
+
+
+   Delete Code
+
+
+   try {
+            String id = txtId.getText();
+            pst=con.prepareStatement("DELETE FROM attendance WHERE id=?");
+            pst.setString(1,id);
+            
+            int k = pst.executeUpdate();
+            if(k==1){
+
+             JOptionPane.showMessageDialog(this, "Record Deleted");
+             ShowData();
+
+            }else{
+
+            JOptionPane.showMessageDialog(this, "Error, Please try again");
+
+           }
+        } catch (SQLException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }                               
+
+
+
+
+     Clear Code
+
+     txtId.setText("");
+             txtName.setText("");
+             txtSection.setText("");
+             txtStatus.setText("");
